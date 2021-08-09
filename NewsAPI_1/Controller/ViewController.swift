@@ -437,7 +437,7 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
         return newsTableView.frame.size.height
     }
     
-    
+    //Button Action
     @IBAction func onTapOfDiscoverBtn(_ sender: UIBarButtonItem)
     {
         let DVC = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(identifier: "DiscoverViewController") as! DiscoverViewController
