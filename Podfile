@@ -10,5 +10,10 @@ pod 'FBSDKLoginKit'
 pod 'FBSDKCoreKit'  
 pod 'FBSDKShareKit'
 pod 'FBSDKPlacesKit'
+pod 'Firebase/Auth'
+pod 'Firebase/Firestore'
+pod 'Firebase/Analytics'
+pod 'GoogleSignIn'
+pod 'TheAnimation'
 
 end

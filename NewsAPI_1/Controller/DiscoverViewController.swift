@@ -9,14 +9,12 @@ import UIKit
 
 class DiscoverViewController: UIViewController,UITableViewDelegate,UITableViewDataSource {
     
-    
-
     var discoverTableView:UITableView!
     var sectionsArr:[String] = ["CATEGORIES","SUGGESTIONS"]
     var numberOfSections = 0
+    //MARK:- viewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
-
         createDiscoverTableView()
         handleGestureRecogniser()
     }
@@ -41,7 +39,7 @@ class DiscoverViewController: UIViewController,UITableViewDelegate,UITableViewDa
     {
         navigationController?.popViewController(animated: true)
     }
-    
+    //MARK:- TableView
     func createDiscoverTableView()
        {
         discoverTableView = UITableView(frame: view.frame, style: UITableView.Style.grouped)
@@ -101,14 +99,14 @@ class DiscoverViewController: UIViewController,UITableViewDelegate,UITableViewDa
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if(indexPath.row == 0)
         {
-            return 200
+            return tableView.frame.height/3.5
         }else
         {
-            return 750
+            return tableView.frame.height - tableView.frame.height/3.5
         }
         
     }
-    
+    //MARK:- Gesture recogniser
     func handleGestureRecogniser(){
         let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(respondToSwipeGesture))
             swipeRight.direction = .right
@@ -119,6 +117,7 @@ class DiscoverViewController: UIViewController,UITableViewDelegate,UITableViewDa
             self.view.addGestureRecognizer(swipeLeft)
         
     }
+    //Action for gesture recgniser
     @objc func respondToSwipeGesture(gesture: UIGestureRecognizer) {
 
         if let swipeGesture = gesture as? UISwipeGestureRecognizer {

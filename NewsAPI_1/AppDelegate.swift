@@ -8,6 +8,8 @@
 import UIKit
 import CoreData
 import FBSDKCoreKit
+import Firebase
+import GoogleSignIn
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -23,25 +25,38 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                application,
                didFinishLaunchingWithOptions: launchOptions
            )
+        FirebaseApp.configure()
         //let navigationController = application.windows[0].rootViewController as! UINavigationController
 
            return true
        }
+    @available(iOS 9.0, *)
+     func application(_ application: UIApplication, open url: URL,
+                     options: [UIApplication.OpenURLOptionsKey: Any])
+      -> Bool {
+        ApplicationDelegate.shared.application(
+            application,
+            open: url,
+            sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String,
+            annotation: options[UIApplication.OpenURLOptionsKey.annotation]
+        )
+      return GIDSignIn.sharedInstance.handle(url)
+    }
     
-    func application(
-            _ app: UIApplication,
-            open url: URL,
-            options: [UIApplication.OpenURLOptionsKey : Any] = [:]
-        ) -> Bool {
-
-            ApplicationDelegate.shared.application(
-                app,
-                open: url,
-                sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String,
-                annotation: options[UIApplication.OpenURLOptionsKey.annotation]
-            )
-
-        }  
+//    private func application(
+//            _ app: UIApplication,
+//            open url: URL,
+//            options: [UIApplication.OpenURLOptionsKey : Any] = [:]
+//        ) -> Bool {
+//
+//            ApplicationDelegate.shared.application(
+//                app,
+//                open: url,
+//                sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String,
+//                annotation: options[UIApplication.OpenURLOptionsKey.annotation]
+//            )
+//
+//        }
 
     // MARK: UISceneSession Lifecycle
 

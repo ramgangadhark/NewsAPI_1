@@ -22,6 +22,7 @@ class NewsWebViewController: UIViewController, WKUIDelegate {
          print(newsUrl)
          webView.load(URLRequest(url: (URL(string: newsUrl) ?? URL(string: "https://www.thehindu.com/"))!))
      }
+    
     override func loadView() {
        let webConfiguration = WKWebViewConfiguration()
        webView = WKWebView(frame: .zero, configuration: webConfiguration)

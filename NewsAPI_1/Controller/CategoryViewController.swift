@@ -9,6 +9,7 @@ import UIKit
 
 class CategoryViewController: UIViewController,UITableViewDelegate,UITableViewDataSource {
 
+    //MARK:- Variables
     var newsTableView:UITableView!
     var url:String = ""
     var countryImage:UIImageView!
@@ -35,66 +36,38 @@ class CategoryViewController: UIViewController,UITableViewDelegate,UITableViewDa
     var covidInfo:[String:Any]?
     var covidArray:NSArray?
     var isSegmentSelected:Bool = true
-    var index:Int = 3
+    var index:Int = 0
     var urlIndex:Int = 0
-    //var someString:String = "2021-07-013'T'01:24:26Z"
     var publishedTimeArray:[String] = []
     
-    //let dateFormatterGet = DateFormatter()
-    //dateFormatterGet.dateFormat = "yyyy-MM-dd HH:mm:ss"
-    
+
     var publishedAtArray:[String] = []
     var sourceNameArr:Array = [Any]()
     
     var publishedTimeArray1:[String] = []
     var publishedTimeArray2:[Any] = []
-    
+    //MARK:- viewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("---index---")
-        print(index)
         ApiCall(index: index)
         createNewsTableView()
         self.navigationItem.title = Constants.categoryArray1[index]
+        print(index)
         
-
-        // Do any additional setup after loading the view.
     }
     
-
-    func calculateTimeDifference(from dateTime1: String, to dateTime2: String) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        
-        let dateAsString = dateTime1
-        let date1 = dateFormatter.date(from: dateAsString)!
-        
-        let dateAsString2 = dateTime2
-        let date2 = dateFormatter.date(from: dateAsString2)!
-        
-        let components : NSCalendar.Unit = [.second, .minute, .hour, .day,.month, .year]
-        let difference = (Calendar.current as NSCalendar).components(components, from: date1, to: date2, options: [])
-        
-        var dateTimeDifferenceString = ""
-
-        if difference.day != 0 {
-            dateTimeDifferenceString = "\(difference.day!)day \(difference.hour!) hours ago"
-        } else if  difference.day == 0 {
-            dateTimeDifferenceString = "\(difference.hour!)hours ago"
-        }
-        return dateTimeDifferenceString
-    }
-    
+    //MARK:- API Call Function
     func ApiCall(index:Int){
         NetworkManager.shared.APICall(url: "\(Constants.news_API)category=\( Constants.categoryArray[index])&apiKey=\(Constants.news_API_Key)") { (Data, Err) in
             if(Err != nil){
                 print(Err!)
             }
             else{
+                print(Data!)
                 for i in 0..<Data!.count
                 {
                     self.newsDataDictionary = ((Data![i]) as! NSDictionary)
-                    print(self.newsDataDictionary!)
+                    //print(self.newsDataDictionary!)
                     self.authorArray.append(self.newsDataDictionary!["author"]!)
                     self.titleArray.append(self.newsDataDictionary!["title"]!)
                     self.descriptionArray.append(self.newsDataDictionary!["description"]!)
@@ -114,7 +87,6 @@ class CategoryViewController: UIViewController,UITableViewDelegate,UITableViewDa
                     let someSTring = self.publishedTimeArray1[i].replacingOccurrences(of: "T", with: " ", options: String.CompareOptions.literal, range: nil)
                     self.publishedTimeArray2.append(someSTring)
                 }
-                print(self.publishedTimeArray2)
                 for i in 0..<self.sourceArray.count{
                     let sourceDict = self.sourceArray[i] as! NSDictionary
                     self.sourceNameArr.append(sourceDict["name"]!)
@@ -126,7 +98,7 @@ class CategoryViewController: UIViewController,UITableViewDelegate,UITableViewDa
         }
     }
     
-    
+    //MARK:- Creating TableView
     func createNewsTableView()
        {
         newsTableView = UITableView(frame: view.frame, style: UITableView.Style.grouped)
@@ -157,6 +129,7 @@ class CategoryViewController: UIViewController,UITableViewDelegate,UITableViewDa
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        index = indexPath.row
         if(authorArray.count == 0)
         {
             let cell = newsTableView.dequeueReusableCell(withIdentifier: "PlaceholderTableViewCell", for: indexPath) as! PlaceholderTableViewCell
@@ -164,15 +137,13 @@ class CategoryViewController: UIViewController,UITableViewDelegate,UITableViewDa
         }else
         {
             urlIndex = indexPath.row
-            let todayDate = Date()
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-            let currentTime = formatter.string(from: todayDate)
+            let currentTime = Utilities.getCurrentTime()
+            let timeData = Utilities.calculateTimeDifference(from: publishedTimeArray2[indexPath.row] as! String, to: currentTime)
             let cell = newsTableView.dequeueReusableCell(withIdentifier: "NewsTableViewCell", for: indexPath) as! NewsTableViewCell
             
             cell.titleLbl.text = titleArray[indexPath.row] as? String
             cell.descriptionLbl.text = contentArray[indexPath.row] as? String
-            cell.swipeLeftLbl.text = "swipe left for more at \(sourceNameArr[indexPath.row]) / \(calculateTimeDifference(from: publishedTimeArray2[indexPath.row] as! String, to: currentTime))"
+            cell.swipeLeftLbl.text = "swipe left for more at \(sourceNameArr[indexPath.row]) / \(timeData)"
 
             if(imgURLArray[indexPath.row] is NSNull)
             {
@@ -180,6 +151,7 @@ class CategoryViewController: UIViewController,UITableViewDelegate,UITableViewDa
             }else
             {
                 do{
+                    
                     cell.NewsImageView.image = try UIImage(data: Data(contentsOf: URL(string: imgURLArray[indexPath.row] as! String)!))
                 }catch
                 {
@@ -193,15 +165,14 @@ class CategoryViewController: UIViewController,UITableViewDelegate,UITableViewDa
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         handleGestureRecogniser(indexNumber:indexPath.row)
-        //print(urlArray[indexPath.row])
-        
-
         self.navigationController?.hidesBarsOnTap = true
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return newsTableView.frame.size.height
     }
+    //MARK:- Gesture Recogniser Function
     func handleGestureRecogniser(indexNumber:Int){
+        index = indexNumber
         let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(respondToSwipeGesture))
             swipeRight.direction = .right
             self.view.addGestureRecognizer(swipeRight)
@@ -211,6 +182,7 @@ class CategoryViewController: UIViewController,UITableViewDelegate,UITableViewDa
             self.view.addGestureRecognizer(swipeLeft)
         
     }
+    //Action for gesture recogniser
     @objc func respondToSwipeGesture(gesture: UIGestureRecognizer) {
 
         if let swipeGesture = gesture as? UISwipeGestureRecognizer {
@@ -229,8 +201,8 @@ class CategoryViewController: UIViewController,UITableViewDelegate,UITableViewDa
                 let NWVC = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(identifier: "NewsWebViewController") as! NewsWebViewController
                 NWVC.modalPresentationStyle = .fullScreen
                 navigationController?.pushViewController(NWVC, animated: true, completion: {
-                    NWVC.newsUrl = "\(self.urlArray[self.urlIndex])"
-                    //print("Navigate to tableview \(self.urlArray[self.urlIndex])")
+                    NWVC.newsUrl = "\(self.urlArray[self.index])"
+                    print("Navigate to tableview \(self.urlArray[self.index])")
                 })
             case .up:
                 print("Swiped up")

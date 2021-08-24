@@ -10,14 +10,20 @@ import FBSDKLoginKit
 import FBSDKCoreKit
 import FBSDKShareKit
 import FBSDKPlacesKit
+import GoogleSignIn
+import Firebase
 
 class LoginViewController: UIViewController,LoginButtonDelegate {
 
     
-    
+    //MARK:- Variables
     @IBOutlet weak var facebookLoginBtn: FBLoginButton!
+    var provider = OAuthProvider(providerID: "twitter.com")
     var imageURL:String = ""
     var loginDetails:NSDictionary = [:]
+    var twitterUserData:[String:Any] = [:]
+    var googleUserData:[String:Any] = [:]
+    //MARK:- viewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
         facebookLoginBtn.permissions = ["public_profile", "email"]
@@ -42,6 +48,7 @@ class LoginViewController: UIViewController,LoginButtonDelegate {
     }
     
 
+    //MARK:- Facebook Login
     func loginButton(_ loginButton: FBLoginButton, didCompleteWith result: LoginManagerLoginResult?, error: Error?)
     {
            getGraph()
@@ -53,20 +60,14 @@ class LoginViewController: UIViewController,LoginButtonDelegate {
             print("logout")
        }
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
     func getGraph()
     {
         let graph = GraphRequest(graphPath: "Me", parameters: ["fields":"id , first_name,last_name,email,name, picture.type(large)"], httpMethod: HTTPMethod(rawValue: "GET"))
         graph.start { (conn, result, err) in
+//            guard let result = result , err == nil else{
+//                return
+//            }
             
                 if(err == nil) {
                     self.loginDetails = result as! NSDictionary
@@ -91,92 +92,80 @@ class LoginViewController: UIViewController,LoginButtonDelegate {
                 }
         }
     }
+    
+    //MARK:- Google Sign In
+    @IBAction func googleSignInBtnPressed(_ sender: UIButton) {
+        guard let clientID = FirebaseApp.app()?.options.clientID else { return }
 
+        // Create Google Sign In configuration object.
+        let config = GIDConfiguration(clientID: clientID)
+
+        // Start the sign in flow!
+        GIDSignIn.sharedInstance.signIn(with: config, presenting: self) {  user, error in
+
+            if error != nil {
+            // ...
+            return
+          }
+
+          guard
+            let authentication = user?.authentication,
+            let idToken = authentication.idToken
+          else {
+            return
+          }
+
+          let credential = GoogleAuthProvider.credential(withIDToken: idToken,
+                                                         accessToken: authentication.accessToken)
+            Auth.auth().signIn(with: credential) { authResult, error in
+                if let error = error {
+                    print(error.localizedDescription)
+
+                }
+
+                self.googleUserData = authResult!.additionalUserInfo!.profile!
+                print(self.googleUserData)
+                print(self.googleUserData["name"]!)
+                //LoginViewController.sendDataDelegate?.didTapChoice(email: "ram@gmail.com", name: "self.googleUserData", profileImg: "someImage")
+                self.navigationController?.popViewController(animated: true, completion: {
+                 
+                    
+                })
+                
+            }
+
+        }
+    }
+    //MARK:- Twitter Sign In
+    @IBAction func twitterSignInBtnPressed(_ sender: UIButton) {
+        provider.getCredentialWith(nil) { credential, error in
+          if error != nil {
+            // Handle error.
+          }
+          if credential != nil {
+            Auth.auth().signIn(with: credential!) { authResult, error in
+                if let err = error {
+                    print(err.localizedDescription)
+                }else{
+                    //print(authResult?.additionalUserInfo?.profile)
+                    if (authResult?.additionalUserInfo?.profile) != nil{
+                        //print(authResult!.additionalUserInfo!.profile!)
+                        self.twitterUserData = authResult!.additionalUserInfo!.profile!
+                        print(self.twitterUserData["email"]!)
+                        
+                        self.navigationController?.popViewController(animated: true, completion: {
+
+                            
+                        })
+                        
+                    }else
+                    {
+                        
+                    }
+                }
+
+            }
+          }
+        }
+    }
 }
-//<key>CFBundleURLTypes</key>
-//<array>
-//    <dict>
-//        <key>CFBundleURLSchemes</key>
-//        <array>
-//            <string>fb1119709878520946</string>
-//        </array>
-//    </dict>
-//    <dict/>
-//</array>
-//<key>CFBundleVersion</key>
-//<string>1</string>
-//<key>FacebookAppID</key>
-//<string>1119709878520946</string>
-//<key>FacebookClientToken</key>
-//<string>NewsApp</string>
-//<key>FacebookDisplayName</key>
-//<string>NewsApp</string>
-//<key>LSApplicationQueriesSchemes</key>
-//<array>
-//    <string>fbapi</string>
-//    <string>fbapi20130214</string>
-//    <string>fbapi20130410</string>
-//    <string>fbapi20130702</string>
-//    <string>fbapi20131010</string>
-//    <string>fbapi20131219</string>
-//    <string>fbapi20140410</string>
-//    <string>fbapi20140116</string>
-//    <string>fbapi20150313</string>
-//    <string>fbapi20150629</string>
-//    <string>fbapi20160328</string>
-//    <string>fbauth</string>
-//    <string>fb-messenger-share-api</string>
-//    <string>fbauth2</string>
-//    <string>fbshareextension</string>
-//</array>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//<key>CFBundleURLTypes</key>
-//
-//
-//<array>
-//    <dict>
-//        <key>CFBundleURLSchemes</key>
-//        <array>
-//            <string>fbAPP-ID</string>
-//        </array>
-//    </dict>
-//    <dict/>
-//</array>
-//
-//<key>FacebookAppID</key>
-//<string>1119709878520946</string>
-//<key>FacebookClientToken</key>
-//<string>NewsApp</string>
-//<key>FacebookDisplayName</key>
-//<string>NewsApp</string>
-//<key>LSApplicationQueriesSchemes</key>
-//<array>
-//    <string>fbapi</string>
-//    <string>fbapi20130214</string>
-//    <string>fbapi20130410</string>
-//    <string>fbapi20130702</string>
-//    <string>fbapi20131010</string>
-//    <string>fbapi20131219</string>
-//    <string>fbapi20140410</string>
-//    <string>fbapi20140116</string>
-//    <string>fbapi20150313</string>
-//    <string>fbapi20150629</string>
-//    <string>fbapi20160328</string>
-//    <string>fbauth</string>
-//    <string>fb-messenger-share-api</string>
-//    <string>fbauth2</string>
-//    <string>fbshareextension</string>
-//</array>

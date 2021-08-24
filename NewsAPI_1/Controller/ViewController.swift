@@ -11,7 +11,7 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
     
     
 
-    
+    //MARK:- Variable Declaration
     @IBOutlet weak var reloadBarBtn: UIBarButtonItem!
     @IBOutlet weak var mainView: UIView!
     var newsTableView:UITableView!
@@ -61,9 +61,10 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
     
     
     
-    
+    //MARK:- ViewDidLoad Function
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         ApiCall()
         createNewsTableView()
         createButton()
@@ -73,7 +74,7 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
             newsTableView.addSubview(refreshControl)
         }
         
-        refreshControl.addTarget(self, action: #selector(refreshWeatherData(_:)), for: .valueChanged)
+        refreshControl.addTarget(self, action: #selector(refreshData(_:)), for: .valueChanged)
         refreshControl.tintColor = UIColor(red:0.25, green:0.72, blue:0.85, alpha:1.0)
         refreshControl.attributedTitle = NSAttributedString(string: "Fetching News ...")
         
@@ -82,14 +83,10 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
         backToTopBtn.addTarget(self, action: #selector(backToTop) , for: UIControl.Event.touchUpInside)
         let backToTopItem = UIBarButtonItem(customView: backToTopBtn)
         self.navigationItem.rightBarButtonItem = backToTopItem
-        
-        
-        
     }
     
-    @objc private func refreshWeatherData(_ sender: Any) {
-        // Fetch Weather Data
-        print("refreshing")
+    //Refresh Conrol Action
+    @objc private func refreshData(_ sender: Any) {
         ApiCall()
         self.newsTableView.delegate = self
         newsTableView.dataSource = self
@@ -97,26 +94,23 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
         
         DispatchQueue.main.asyncAfter(deadline: .now()+3){
             self.newsTableView.refreshControl?.endRefreshing()
-
         }
-        //refreshControl.endRefreshing()
-        
     }
     
-    func createReloadBtn(){
-        reloadBtn.setImage(UIImage(systemName: "goforward"), for: .normal)
-        reloadBtn.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-        reloadBtn.addTarget(self, action: #selector(reloadData), for: .touchUpInside)
-        let reloadItem = UIBarButtonItem(customView: reloadBtn)
-        self.navigationItem.rightBarButtonItem  = reloadItem
-        
-    }
+//    func createReloadBtn(){
+//        reloadBtn.setImage(UIImage(systemName: "goforward"), for: .normal)
+//        reloadBtn.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
+//        reloadBtn.addTarget(self, action: #selector(reloadData), for: .touchUpInside)
+//        let reloadItem = UIBarButtonItem(customView: reloadBtn)
+//        self.navigationItem.rightBarButtonItem  = reloadItem
+//
+//    }
     func createBackToTopBtn(){
        
         
         backToTopBtn.setImage(UIImage(systemName: "square.and.arrow.up"), for: UIControl.State.normal)
         backToTopBtn.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-        backToTopBtn.addTarget(self, action: #selector(reloadData) , for: UIControl.Event.touchUpInside)
+        //backToTopBtn.addTarget(self, action: #selector(reloadData) , for: UIControl.Event.touchUpInside)
         let backToTopItem = UIBarButtonItem(customView: backToTopBtn)
         self.navigationItem.rightBarButtonItem = backToTopItem
     }
@@ -126,88 +120,48 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
         newsTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
     }
     
-    @objc func reloadData(){
- 
-        
-        if(isIndexZero == true)
-        {
-            
-            //ApiCall()
-            newsTableView.reloadData()
-            print("Reload")
-            isIndexZero = false
-            reloadBtn.isHidden = false
-            backToTopBtn.isHidden = true
-            //reloadBtn.setImage(UIImage(systemName: "square.and.arrow.up"), for: .normal)
-            //reloadBtn.layoutIfNeeded()
-            
-            //backToTopBtn.removeFromSuperview()
-            //createReloadBtn()
-        }else
-        {
-            reloadBtn.isHidden = true
-            backToTopBtn.isHidden = false
-            //newsTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
-            print("Back to Top")
-            isIndexZero = true
-            //reloadBtn.removeFromSuperview()
-            //createBackToTopBtn()
-            reloadBtn.setImage(UIImage(systemName: "goforward"), for: .normal)
-            //reloadBtn.layoutIfNeeded()
-            
-        }
-        
-    }
-    func calculateTimeDifference(from dateTime1: String, to dateTime2: String) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        
-        let dateAsString = dateTime1
-        let date1 = dateFormatter.date(from: dateAsString)!
-        
-        let dateAsString2 = dateTime2
-        let date2 = dateFormatter.date(from: dateAsString2)!
-        
-        let components : NSCalendar.Unit = [.second, .minute, .hour, .day,.month, .year]
-        let difference = (Calendar.current as NSCalendar).components(components, from: date1, to: date2, options: [])
-        
-        var dateTimeDifferenceString = ""
-
-        if difference.day != 0 {
-            dateTimeDifferenceString = "\(difference.day!)day \(difference.hour!) hours ago"
-        } else if  difference.day == 0 {
-            dateTimeDifferenceString = "\(difference.hour!)hours ago"
-        }
-
-        return dateTimeDifferenceString
-        
-        
-//        var timeDifference:Int = 0
-//        var dayDiffernece:Int = 0
-//        if difference.day != 0 {
-//            dayDiffernece = difference.day!
-//        }else if difference.day == 0 {
-//            timeDifference = difference.hour!
-//        }
-//        if(dayDiffernece == 0)
-//        {
-//            return timeDifference
-//        }else{
-//            return dayDiffernece
-//        }
-//        timeDifference = difference.hour!
+//    @objc func reloadData(){
 //
-//        return timeDifference
-        
-    }
+//
+//        if(isIndexZero == true)
+//        {
+//
+//            //ApiCall()
+//            newsTableView.reloadData()
+//            print("Reload")
+//            isIndexZero = false
+//            reloadBtn.isHidden = false
+//            backToTopBtn.isHidden = true
+//            //reloadBtn.setImage(UIImage(systemName: "square.and.arrow.up"), for: .normal)
+//            //reloadBtn.layoutIfNeeded()
+//
+//            //backToTopBtn.removeFromSuperview()
+//            //createReloadBtn()
+//        }else
+//        {
+//            reloadBtn.isHidden = true
+//            backToTopBtn.isHidden = false
+//            //newsTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+//            print("Back to Top")
+//            isIndexZero = true
+//            //reloadBtn.removeFromSuperview()
+//            //createBackToTopBtn()
+//            reloadBtn.setImage(UIImage(systemName: "goforward"), for: .normal)
+//            //reloadBtn.layoutIfNeeded()
+//
+//        }
+//
+//    }
     
+    //MARK:- API Call
+    //Api Call function
     func ApiCall(){
-        NetworkManager.shared.APICall(url: "\(Constants.news_API)category=business&apiKey=\(Constants.news_API_Key)") { (Data, Err) in
+        NetworkManager.shared.APICall(url: "\(Constants.news_API)apiKey=\(Constants.news_API_Key)") { (Data, Err) in
             if(Err != nil){
                 print(Err!)
             }
             else{
-                //print(Data as Any)
+                print(Data as Any)
                 for i in 0..<Data!.count
                 {
                     self.newsDataDictionary = ((Data![i]) as! NSDictionary)
@@ -223,8 +177,8 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
                     //print(self.newsDataDictionary!["source"]!)
                     //print(self.publishedAtArray)
                 }
-                print("Titles")
-                print(self.titleArray)
+                //print("Titles")
+                //print(self.titleArray)
                 for i in 0..<self.publishedAtArray.count
                 {
                     let someString = self.publishedAtArray[i].replacingOccurrences(of: "Z", with: "", options: String.CompareOptions.literal, range: nil)
@@ -237,7 +191,7 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
                     self.publishedTimeArray2.append(someSTring)
                 }
                 //print("a2")
-                print(self.publishedTimeArray2)
+                //print(self.publishedTimeArray2)
                 for i in 0..<self.sourceArray.count{
                     let sourceDict = self.sourceArray[i] as! NSDictionary
                     self.sourceNameArr.append(sourceDict["name"]!)
@@ -272,7 +226,7 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
         
     }
     
-    //MARK:- Creating Floating Button
+    //MARK:- Creating Floating Button for Covid Data
     func createButton(){
         btn = UIButton()
         btn.frame = CGRect(x: view.frame.size.width - 150, y: view.frame.size.height - 150, width: 100, height: 35)
@@ -335,6 +289,7 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
         }
         isMenuViewShowing = !isMenuViewShowing
     }
+    //Creating View for Covid Data
     func creatingMenuView()
     {
         menuView = UIView()
@@ -344,6 +299,8 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
         menuView.layer.cornerRadius = 12
         view.addSubview(menuView)
     }
+    //MARK:- TableView
+    //Creating TableView For News Data
     func createNewsTableView()
        {
         newsTableView = UITableView(frame: view.frame, style: UITableView.Style.grouped)
@@ -363,6 +320,7 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
         newsTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         
        }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if(authorArray.count == 0)
         {
@@ -375,7 +333,7 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         //tableviewIndex = IndexPath(row: indexPath.row, section: indexPath.row)
-        print("cellForRowAt\(indexPath.row)")
+        //print("cellForRowAt\(indexPath.row)")
         index = indexPath.row
         if(authorArray.count == 0)
         {
@@ -394,15 +352,21 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
                 reloadBtn.setImage(UIImage(systemName: "square.and.arrow.up"), for: .normal)
 //                reloadBtn.layoutIfNeeded()
             }
-            let todayDate = Date()
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-            let currentTime = formatter.string(from: todayDate)
+//            let todayDate = Date()
+//            let formatter = DateFormatter()
+//            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+//            let currentTime = formatter.string(from: todayDate)
+            let currentTime = Utilities.getCurrentTime()
+            let timeData = Utilities.calculateTimeDifference(from: publishedTimeArray2[indexPath.row] as! String, to: currentTime)
+            
             let cell = newsTableView.dequeueReusableCell(withIdentifier: "NewsTableViewCell", for: indexPath) as! NewsTableViewCell
             
             cell.titleLbl.text = titleArray[indexPath.row] as? String
             cell.descriptionLbl.text = contentArray[indexPath.row] as? String
-            cell.swipeLeftLbl.text = "swipe left for more at \(sourceNameArr[indexPath.row]) / \(calculateTimeDifference(from: publishedTimeArray2[indexPath.row] as! String, to: currentTime))"
+            
+            
+            cell.swipeLeftLbl.text = "swipe left for more at \(sourceNameArr[indexPath.row]) /  \(timeData)"
+          
             
             
             
@@ -412,11 +376,7 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
             }else
             {
                 do{
-                
-                    
-                
                     cell.NewsImageView.image = try UIImage(data: Data(contentsOf: URL(string: imgURLArray[indexPath.row] as! String)!))
-                
                 }catch
                 {
                     print("Error while loading image")
@@ -429,7 +389,7 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         handleGestureRecogniser(indexNumber:indexPath.row)
-        print("didSelectRowAt\(indexPath.row)")
+        //print("didSelectRowAt\(indexPath.row)")
         //tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
         self.navigationController?.hidesBarsOnTap = true
     }
@@ -437,7 +397,7 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
         return newsTableView.frame.size.height
     }
     
-    //Button Action
+    //Button Action to navigate Discover viewController
     @IBAction func onTapOfDiscoverBtn(_ sender: UIBarButtonItem)
     {
         let DVC = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(identifier: "DiscoverViewController") as! DiscoverViewController
@@ -450,47 +410,40 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
                nav?.pushViewController(DVC, animated: true)
            }
     }
-    
+    //Gesture Recogniser Function
     func handleGestureRecogniser(indexNumber:Int){
         let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(respondToSwipeGesture))
-        //index = indexNumber
-            swipeRight.direction = .right
-            self.view.addGestureRecognizer(swipeRight)
-
-            let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(respondToSwipeGesture))
+        index = indexNumber
+        swipeRight.direction = .right
+        self.view.addGestureRecognizer(swipeRight)
+        
+        let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(respondToSwipeGesture))
         swipeLeft.direction = .left
-            self.view.addGestureRecognizer(swipeLeft)
+        self.view.addGestureRecognizer(swipeLeft)
         
     }
     @objc func respondToSwipeGesture(gesture: UIGestureRecognizer) {
-
+        
         if let swipeGesture = gesture as? UISwipeGestureRecognizer {
-
+            
             switch swipeGesture.direction {
             case .right:
-                print("Swiped right")
+                //print("Swiped right")
                 let DVC = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(identifier: "DiscoverViewController") as! DiscoverViewController
                 DVC.modalPresentationStyle = .fullScreen
                 navigationController?.pushViewController(DVC, animated: true)
-                
                 
             case .down:
                 print("Swiped down")
             case .left:
                 print("Swiped left")
-//                let NWVC = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(identifier: "NWVC") as! NewsWebViewViewController
-//                NWVC.modalPresentationStyle = .fullScreen
-//                navigationController?.pushViewController(NWVC, animated: true, completion: {
-//                    NWVC.newsUrl = self.url
-//                })
+                
                 let NWVC = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(identifier: "NewsWebViewController") as! NewsWebViewController
                 NWVC.modalPresentationStyle = .fullScreen
                 navigationController?.pushViewController(NWVC, animated: true, completion: {
                     NWVC.newsUrl = "\(self.urlArray[self.index])"
                     print("Swipe\(self.index)")
                 })
-                
-               
             case .up:
                 print("Swiped up")
             default:
@@ -499,80 +452,6 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
         }
     }
 }
-//MARK:- UINavigationController Extension for completion Block
-extension UINavigationController {
-    
-    func pushViewController(_ viewController: UIViewController, animated: Bool = true, completion: @escaping () -> Void) {
-        CATransaction.begin()
-        CATransaction.setCompletionBlock(completion)
-        pushViewController(viewController, animated: animated)
-        
-        CATransaction.commit()
-    }
-    
-    func popViewController(animated: Bool = true, completion: @escaping () -> Void) {
-        CATransaction.begin()
-        CATransaction.setCompletionBlock(completion)
-        popViewController(animated: animated)
-        CATransaction.commit()
-    }
-    
-    func popToRootViewController(animated: Bool = true, completion: @escaping () -> Void) {
-        CATransaction.begin()
-        CATransaction.setCompletionBlock(completion)
-        popToRootViewController(animated: animated)
-        CATransaction.commit()
-    }
-    
-}
 
-extension CATransition {
 
-//New viewController will appear from bottom of screen.
-func segueFromBottom() -> CATransition {
-    self.duration = 0.375 //set the duration to whatever you'd like.
-    self.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-    self.type = CATransitionType.moveIn
-    self.subtype = CATransitionSubtype.fromTop
-    return self
-}
-//New viewController will appear from top of screen.
-func segueFromTop() -> CATransition {
-    self.duration = 0.375 //set the duration to whatever you'd like.
-    self.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-    self.type = CATransitionType.moveIn
-    self.subtype = CATransitionSubtype.fromBottom
-    return self
-}
- //New viewController will appear from left side of screen.
-func segueFromLeft() -> CATransition {
-    self.duration = 0.1 //set the duration to whatever you'd like.
-    self.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-    self.type = CATransitionType.moveIn
-    self.subtype = CATransitionSubtype.fromLeft
-    return self
-}
-//New viewController will pop from right side of screen.
-func popFromRight() -> CATransition {
-    self.duration = 0.1 //set the duration to whatever you'd like.
-    self.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-    self.type = CATransitionType.reveal
-    self.subtype = CATransitionSubtype.fromRight
-    return self
-}
-//New viewController will appear from left side of screen.
-func popFromLeft() -> CATransition {
-    self.duration = 0.1 //set the duration to whatever you'd like.
-    self.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-    self.type = CATransitionType.reveal
-    self.subtype = CATransitionSubtype.fromLeft
-    return self
-   }
-}
-
-//let nav = self.navigationController //grab an instance of the current navigationController
-//   DispatchQueue.main.async { //make sure all UI updates are on the main thread.
-//       nav?.view.layer.add(CATransition().segueFromLeft(), forKey: nil)
-//       nav?.pushViewController(YourViewController(), animated: false)
-//   }
 

@@ -6,11 +6,17 @@
 //
 
 import UIKit
+import Firebase
+import GoogleSignIn
+import FBSDKLoginKit
+import FBSDKCoreKit
+import FBSDKShareKit
+import FBSDKPlacesKit
 
 class OptionsViewController: UIViewController,UIPickerViewDataSource, UIPickerViewDelegate {
 
-    
-
+    //MARK:- Variables
+    @IBOutlet weak var signOutBtn: UIBarButtonItem!
     @IBOutlet weak var languageBtn2: UIButton!
     @IBOutlet weak var languageBtn1: UIButton!
     @IBOutlet weak var fBBtn: UIButton!
@@ -23,7 +29,10 @@ class OptionsViewController: UIViewController,UIPickerViewDataSource, UIPickerVi
     //var picker  = UIPickerView()
     let BtnNamePickerValues = ["English","हिंदी"]
     var window:UIWindow?
-    
+    var userName:String = ""
+    var profile:String = ""
+    var userMail:String = ""
+    //MARK:- viewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -37,38 +46,20 @@ class OptionsViewController: UIViewController,UIPickerViewDataSource, UIPickerVi
         callBtn.clipsToBounds = true
         signInBtn.layer.cornerRadius = 5
         BtnNamePicker = UIPickerView()
-        
-        
-        
         //gradeTextField.inputView = BtnNamePicker
         //gradeTextField.text = BtnNamePickerValues[0]
         languageBtn1.setTitle(BtnNamePickerValues[0], for: UIControl.State.normal)
         
         // Do any additional setup after loading the view.
     }
-    func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        return 1
-    }
     
-    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return BtnNamePickerValues.count
-    }
-    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-            return BtnNamePickerValues[row]
-        }
-
-    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int){
-            //gradeTextField.text = BtnNamePickerValues[row]
-        
-        languageBtn1.setTitle(BtnNamePickerValues[row], for: UIControl.State.normal)
-            self.view.endEditing(true)
-        }
+   
+    //MARK:- Button Action
     func navigationToLogin(){
         let LVC = UIStoryboard.init(name: "Main", bundle: Bundle.main).instantiateViewController(identifier: "LoginViewController") as! LoginViewController
         LVC.modalPresentationStyle = .fullScreen
         navigationController?.pushViewController(LVC, animated: true)
     }
-    
     @IBAction func onTapOfBackBtn(_ sender: UIBarButtonItem)
     {
         navigationController?.popViewController(animated: true)
@@ -82,26 +73,22 @@ class OptionsViewController: UIViewController,UIPickerViewDataSource, UIPickerVi
     }
     
     @IBAction func onTapOfFBLoginBtn(_ sender: UIButton) {
-//        LVC.modalPresentationStyle = .fullScreen
-//        navigationController?.pushViewController(LVC, animated: true)
+
         navigationToLogin()
     }
     
     @IBAction func onTapOfGoogleBtn(_ sender: UIButton) {
-//        LVC.modalPresentationStyle = .fullScreen
-//        navigationController?.pushViewController(LVC, animated: true)
+
         navigationToLogin()
     }
     
     @IBAction func onTapOfTwitterBtn(_ sender: UIButton) {
-//        LVC.modalPresentationStyle = .fullScreen
-//        navigationController?.pushViewController(LVC, animated: true)
+
         navigationToLogin()
     }
     
     @IBAction func onTapOfPhoneBtn(_ sender: UIButton) {
-//        LVC.modalPresentationStyle = .fullScreen
-//        navigationController?.pushViewController(LVC, animated: true)
+
         navigationToLogin()
     }
     
@@ -110,27 +97,7 @@ class OptionsViewController: UIViewController,UIPickerViewDataSource, UIPickerVi
         
     }
     
-    func createBtnPickerView(){
-        BtnNamePicker = UIPickerView.init()
-        BtnNamePicker.delegate = self
-        BtnNamePicker.dataSource = self
-        BtnNamePicker.backgroundColor = UIColor.white
-        BtnNamePicker.setValue(UIColor.black, forKey: "textColor")
-        BtnNamePicker.autoresizingMask = .flexibleWidth
-        BtnNamePicker.contentMode = .center
-        BtnNamePicker.frame = CGRect.init(x: 0.0, y: UIScreen.main.bounds.size.height - 300, width: UIScreen.main.bounds.size.width, height: 300)
-        self.view.addSubview(BtnNamePicker)
-        
-        toolBar = UIToolbar.init(frame: CGRect.init(x: 0.0, y: UIScreen.main.bounds.size.height - 300, width: UIScreen.main.bounds.size.width, height: 50))
-        toolBar.barStyle = .blackTranslucent
-        toolBar.items = [UIBarButtonItem.init(title: "Done", style: .done, target: self, action: #selector(onDoneButtonTapped))]
-        self.view.addSubview(toolBar)
-    }
     
-    @objc func onDoneButtonTapped() {
-        toolBar.removeFromSuperview()
-        BtnNamePicker.removeFromSuperview()
-    }
     
     @IBAction func onTapOfLanguageBtn2(_ sender: UIButton)
     {
@@ -202,4 +169,64 @@ class OptionsViewController: UIViewController,UIPickerViewDataSource, UIPickerVi
         }
     }
     
+    @IBAction func signOutPressed(_ sender: UIBarButtonItem) {
+        //print("SigOut as \(userName) or \(userMail)")
+        //let loginVC = storyboard?.instantiateViewController(identifier: "LoginViewController") as! LoginViewController
+//        LoginViewController.sendDataDelegate = self
+//        let firebaseAuth = Auth.auth()
+//        do {
+//            try firebaseAuth.signOut()
+//            print("logout Successful")
+//        } catch let signOutError as NSError {
+//            print("Error signing out: %@", signOutError)
+//        }
+        func loginButtonDidLogOut(_ loginButton: FBLoginButton)
+        {
+             //userName.text = ""
+             print("logout")
+        }
+    }
+    //MARK:- PickerView
+    func createBtnPickerView(){
+        BtnNamePicker = UIPickerView.init()
+        BtnNamePicker.delegate = self
+        BtnNamePicker.dataSource = self
+        BtnNamePicker.backgroundColor = UIColor.white
+        BtnNamePicker.setValue(UIColor.black, forKey: "textColor")
+        BtnNamePicker.autoresizingMask = .flexibleWidth
+        BtnNamePicker.contentMode = .center
+        BtnNamePicker.frame = CGRect.init(x: 0.0, y: UIScreen.main.bounds.size.height - 300, width: UIScreen.main.bounds.size.width, height: 300)
+        self.view.addSubview(BtnNamePicker)
+        
+        toolBar = UIToolbar.init(frame: CGRect.init(x: 0.0, y: UIScreen.main.bounds.size.height - 300, width: UIScreen.main.bounds.size.width, height: 50))
+        //toolBar.barStyle = .blackTranslucent
+        toolBar.isTranslucent = true
+        toolBar.items = [UIBarButtonItem.init(title: "Done", style: .done, target: self, action: #selector(onDoneButtonTapped))]
+        self.view.addSubview(toolBar)
+    }
+    
+    @objc func onDoneButtonTapped() {
+        toolBar.removeFromSuperview()
+        BtnNamePicker.removeFromSuperview()
+    }
+    
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return BtnNamePickerValues.count
+    }
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+            return BtnNamePickerValues[row]
+        }
+
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int){
+            //gradeTextField.text = BtnNamePickerValues[row]
+        
+        languageBtn1.setTitle(BtnNamePickerValues[row], for: UIControl.State.normal)
+            self.view.endEditing(true)
+        }
+    
 }
+

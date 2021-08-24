@@ -36,32 +36,33 @@ class NetworkManager: NSObject {
 
         let url = URL(string: url)
         URLSession.shared.dataTask(with:url!) { [self] (data, response, error) in
+            guard let data = data , error == nil else{
+                print("something went wrong")
+                return
+            }
           if error != nil {
             print(error!)
             completion(nil,error)
           } else {
             do {
 
-                let parsedData = try JSONSerialization.jsonObject(with: data!) as! [String:Any]
-              //let currentConditions = parsedData
-                //print(currentConditions[0])
-//                print("Category")
-//                print(Constants.category["technology"]!)
-                
+                let parsedData = try JSONSerialization.jsonObject(with: data) as! [String:Any]
+
                 let someDict:[String:Any] = parsedData
-                self.newsArray = someDict["articles"]! as? NSArray
+               
+                 self.newsArray = someDict["articles"]! as? NSArray
+                guard let newsArray = newsArray else{
+                    print("something went wrong")
+                    return
+                }
                 completion(newsArray,nil)
                 //print(self.newsArray!.count)
                 //print(self.newsArray!)
-                
                 for i in 0..<self.newsArray!.count
                 {
                     self.newsDataDictionary = ((self.newsArray![i]) as! NSDictionary)
                     //print(self.newsDataDictionary!["author"]!)
-                    
-                        self.authorArray.append(self.newsDataDictionary!["author"]!)
-                    
-                    
+                    self.authorArray.append(self.newsDataDictionary!["author"]!)
                     self.titleArray.append(self.newsDataDictionary!["title"]!)
                     self.descriptionArray.append(self.newsDataDictionary!["description"]!)
                     self.imgURLArray.append(self.newsDataDictionary!["urlToImage"]!)
@@ -73,9 +74,7 @@ class NetworkManager: NSObject {
               print(error)
             }
           }
-
         }.resume()
-        
     }
     
     func covidAPI(){

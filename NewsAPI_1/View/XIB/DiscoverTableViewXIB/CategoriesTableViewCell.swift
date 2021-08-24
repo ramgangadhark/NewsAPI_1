@@ -33,13 +33,13 @@ class CategoriesTableViewCell: UITableViewCell,UICollectionViewDelegate,UICollec
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = categoriesCollectionView.dequeueReusableCell(withReuseIdentifier: "CategoriesCollectionViewCell", for: indexPath) as! CategoriesCollectionViewCell
         cell.categoryImgView.image = UIImage(named: "Img0\(indexPath.row)")
-        print(indexPath.row)
+        //print(indexPath.row)
         cell.categoryLbl.text = "\(categoryArr[indexPath.row])"
         
         return cell
     }
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print(indexPath.row)
+        //print(indexPath.row)
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: 125, height: 150)
